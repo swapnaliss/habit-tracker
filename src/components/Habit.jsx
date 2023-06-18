@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 
 const Habit = ({ habit, onEdit, onDelete, onArchive, onUnarchive }) => {
-    console.log(habit)
+
     const handleEdit = () => {
         onEdit(habit);
     };
@@ -16,25 +16,25 @@ const Habit = ({ habit, onEdit, onDelete, onArchive, onUnarchive }) => {
         onArchive(habit);
     };
 
-    // const handleUnarchive = () => {
-    //     onUnarchive(habit);
-    // };
+    const handleUnarchive = () => {
+        onUnarchive(habit);
+    };
 
-    // const renderArchiveButton = () => {
-    //     if (habit.archived) {
-    //         return (
-    //             <Button variant="success" onClick={handleUnarchive}>
-    //                 Unarchive
-    //             </Button>
-    //         );
-    //     } else {
-    //         return (
-    //             <Button variant="secondary" onClick={handleArchive}>
-    //                 Archive
-    //             </Button>
-    //         );
-    //     }
-    // };
+    const renderArchiveButton = () => {
+        if (habit.archived) {
+            return (
+                <Button variant="success" onClick={handleUnarchive}>
+                    Unarchive
+                </Button>
+            );
+        } else {
+            return (
+                <Button variant="secondary" onClick={handleArchive}>
+                    Archive
+                </Button>
+            );
+        }
+    };
 
 
     return (
@@ -50,7 +50,8 @@ const Habit = ({ habit, onEdit, onDelete, onArchive, onUnarchive }) => {
                     </Card.Text>
                     <Button variant="primary" onClick={handleEdit}>Edit</Button>{' '}
                     <Button variant="danger" onClick={handleDelete}>Delete</Button>{' '}
-                    <Button variant="secondary" onClick={handleArchive}>Archive</Button>
+                    {/* <Button variant="secondary" onClick={handleArchive}>Archive</Button> */}
+                    {renderArchiveButton()}
                 </Card.Body>
             </Card>
         </div>

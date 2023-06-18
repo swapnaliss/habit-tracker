@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
-import { Button, ListGroup, Modal, Form } from 'react-bootstrap';
+import { Button, ListGroup, Modal, Form, Container, Row, Col } from 'react-bootstrap';
 import Habit from './Habit';
 
 const HabitList = () => {
@@ -47,8 +47,10 @@ const HabitList = () => {
 
 
     const handleHabitClick = (habit) => {
-        setSelectedHabit(null);
         setSelectedHabit(habit);
+        if(selectedHabit) {
+            setSelectedHabit(null);
+        }
     };
 
     const handleDelete = (habit) => {
@@ -63,22 +65,36 @@ const HabitList = () => {
     };
 
     const handleArchive = (habit) => {
+
+        let archivedHabit = null
         const updatedHabits = allHabits.map((h) => {
-          if (h === habit) {
-            return { ...h, archived: true };
-          }
-          return h;
+            if (h === habit) {
+                archivedHabit = { ...h, archived: true };
+                return { ...h, archived: true };
+            }
+            return h;
         }).filter((h) => !h.archived);
+
         setAllHabits(updatedHabits);
-        setArchivedHabits([...archivedHabits, habit]);
+        setArchivedHabits([...archivedHabits, archivedHabit]);
 
         setSelectedHabit(null);
-      };
-      
+    };
+
     const handleUnarchive = (habit) => {
-        const updatedHabits = archivedHabits.filter((h) => h !== habit);
+
+        let unarchivedHabit = null
+        const updatedHabits = archivedHabits.map((h) => {
+            if (h === habit) {
+                unarchivedHabit = { ...h, archived: false };
+                return { ...h, archived: false };
+            }
+            return h;
+        }).filter((h) => h.archived);
+
         setArchivedHabits(updatedHabits);
-        setAllHabits([...allHabits, habit]);
+        setAllHabits([...allHabits, unarchivedHabit]);
+
         setSelectedHabit(null);
     };
 
@@ -86,27 +102,36 @@ const HabitList = () => {
         setAllHabits(habits);
     }, [habits]);
 
-    console.log(archivedHabits)
+    console.log(selectedHabit)
     return (
         <div>
-            <div>
-                <h2>Archived Habits</h2>
-                <ListGroup>
-                    {archivedHabits.map((habit, index) => (
-                        <ListGroup.Item key={index}>
-                            <Button variant="link" onClick={() => handleHabitClick(habit)}>{habit.name}</Button>
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
-            </div>
-            <h2>Habit Listing Page</h2>
-            <ListGroup>
-                {allHabits.map((habit, index) => (
-                    <ListGroup.Item key={index}>
-                        <Button variant="link" onClick={() => handleHabitClick(habit)}>{habit.name}</Button>
-                    </ListGroup.Item>
-                ))}
-            </ListGroup>
+            <Button variant="primary" onClick={handleShow}>
+                Add a new habit
+            </Button>
+            <Container>
+                <Row>
+                    <Col>
+                        <h2>Habit List</h2>
+                        <ListGroup>
+                            {allHabits.map((habit, index) => (
+                                <ListGroup.Item key={index}>
+                                    <Button variant="link" onClick={() => handleHabitClick(habit)}>{habit.name}</Button>
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Col>
+                    <Col>
+                        <h2>Archived Habits</h2>
+                        <ListGroup>
+                            {archivedHabits.map((habit, index) => (
+                                <ListGroup.Item key={index}>
+                                    <Button variant="link" onClick={() => handleHabitClick(habit)}>{habit.name}</Button>
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Col>
+                </Row>
+            </Container>
 
             {selectedHabit && (
                 <Habit
@@ -119,10 +144,6 @@ const HabitList = () => {
             )}
 
             <div>
-                <Button variant="primary" onClick={handleShow}>
-                    Add a new habit
-                </Button>
-
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>{selectedHabit ? 'Edit Habit' : 'Add a Habit'}</Modal.Title>
