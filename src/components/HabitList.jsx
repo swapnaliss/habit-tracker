@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 
 import { Button, ListGroup, Modal, Form } from 'react-bootstrap';
 import Habit from './Habit';
@@ -9,6 +9,7 @@ const HabitList = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [selectedHabit, setSelectedHabit] = useState(null);
+    const [editingHabit, setEditingHabit] = useState(null);
 
 
     const habits = useMemo(() => [
@@ -18,23 +19,34 @@ const HabitList = () => {
 
     ], []);
 
-    const handleAddNewHabit = (e) => {
+    const handleAddNewHabit = useCallback((e) => {
         e.preventDefault();
-
+      
         const newHabit = {
-            name: e.target.elements.habitName.value,
-            goal: e.target.elements.habitGoal.value,
-            times: e.target.elements.habitTimes.value,
-            startDate: e.target.elements.habitStartDate.value,
-            endDate: e.target.elements.habitEndDate.value,
+          name: e.target.elements.habitName.value,
+          goal: e.target.elements.habitGoal.value,
+          times: e.target.elements.habitTimes.value,
+          startDate: e.target.elements.habitStartDate.value,
+          endDate: e.target.elements.habitEndDate.value,
         };
-        habits.push(newHabit);
-
-        console.log(newHabit);
+      
+        if (editingHabit) {
+          const updatedHabits = allHabits.map((habit) =>
+            habit === editingHabit ? newHabit : habit
+          );
+          setAllHabits(updatedHabits);
+          setEditingHabit(null);
+          setSelectedHabit(null)
+        } else {
+          setAllHabits([...allHabits, newHabit]);
+        }
+      
         setShow(false);
-    };
+      }, [allHabits, editingHabit]);
+      
 
     const handleHabitClick = (habit) => {
+        setSelectedHabit(null); 
         setSelectedHabit(habit);
     };
 
@@ -42,6 +54,11 @@ const HabitList = () => {
         const updatedHabits = allHabits.filter((h) => h !== habit);
         setAllHabits(updatedHabits);
         setSelectedHabit(null);
+    };
+
+    const handleEditHabit = (habit) => {
+        setEditingHabit(habit);
+        handleShow();
     };
 
     useEffect(() => {
@@ -63,6 +80,7 @@ const HabitList = () => {
                 <Habit
                     habit={selectedHabit}
                     onDelete={handleDelete}
+                    onEdit={handleEditHabit}
                 />
             )}
 
@@ -82,7 +100,7 @@ const HabitList = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter name"
-                                    defaultValue={selectedHabit ? selectedHabit.name : ''}
+                                    defaultValue={editingHabit ? editingHabit.name : ''}
                                 />
                             </Form.Group>
                             <Form.Group controlId="habitGoal">
@@ -90,7 +108,7 @@ const HabitList = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter goal"
-                                    defaultValue={selectedHabit ? selectedHabit.goal : ''}
+                                    defaultValue={editingHabit ? editingHabit.goal : ''}
                                 />
                             </Form.Group>
                             <Form.Group controlId="habitTimes">
@@ -98,7 +116,7 @@ const HabitList = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter times"
-                                    defaultValue={selectedHabit ? selectedHabit.times : ''}
+                                    defaultValue={editingHabit ? editingHabit.times : ''}
                                 />
                             </Form.Group>
                             <Form.Group controlId="habitStartDate">
@@ -106,7 +124,7 @@ const HabitList = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter start date"
-                                    defaultValue={selectedHabit ? selectedHabit.startDate : ''}
+                                    defaultValue={editingHabit ? editingHabit.startDate : ''}
                                 />
                             </Form.Group>
                             <Form.Group controlId="habitEndDate">
@@ -114,14 +132,11 @@ const HabitList = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter end date"
-                                    defaultValue={selectedHabit ? selectedHabit.endDate : ''}
+                                    defaultValue={editingHabit ? editingHabit.endDate : ''}
                                 />
                             </Form.Group>
                             <Button variant="primary" type="submit">
-                                {selectedHabit ? 'Update' : 'Add'}
-                            </Button>
-                            <Button variant="secondary" onClick={handleClose}>
-                                Cancel
+                                {editingHabit ? 'Update' : 'Add'}
                             </Button>
                         </Form>
                     </Modal.Body>
