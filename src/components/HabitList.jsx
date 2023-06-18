@@ -10,6 +10,7 @@ const HabitList = () => {
     const handleShow = () => setShow(true);
     const [selectedHabit, setSelectedHabit] = useState(null);
     const [editingHabit, setEditingHabit] = useState(null);
+    const [archivedHabits, setArchivedHabits] = useState([]);
 
 
     const habits = useMemo(() => [
@@ -21,32 +22,32 @@ const HabitList = () => {
 
     const handleAddNewHabit = useCallback((e) => {
         e.preventDefault();
-      
+
         const newHabit = {
-          name: e.target.elements.habitName.value,
-          goal: e.target.elements.habitGoal.value,
-          times: e.target.elements.habitTimes.value,
-          startDate: e.target.elements.habitStartDate.value,
-          endDate: e.target.elements.habitEndDate.value,
+            name: e.target.elements.habitName.value,
+            goal: e.target.elements.habitGoal.value,
+            times: e.target.elements.habitTimes.value,
+            startDate: e.target.elements.habitStartDate.value,
+            endDate: e.target.elements.habitEndDate.value,
         };
-      
+
         if (editingHabit) {
-          const updatedHabits = allHabits.map((habit) =>
-            habit === editingHabit ? newHabit : habit
-          );
-          setAllHabits(updatedHabits);
-          setEditingHabit(null);
-          setSelectedHabit(null)
+            const updatedHabits = allHabits.map((habit) =>
+                habit === editingHabit ? newHabit : habit
+            );
+            setAllHabits(updatedHabits);
+            setEditingHabit(null);
+            setSelectedHabit(null)
         } else {
-          setAllHabits([...allHabits, newHabit]);
+            setAllHabits([...allHabits, newHabit]);
         }
-      
+
         setShow(false);
-      }, [allHabits, editingHabit]);
-      
+    }, [allHabits, editingHabit]);
+
 
     const handleHabitClick = (habit) => {
-        setSelectedHabit(null); 
+        setSelectedHabit(null);
         setSelectedHabit(habit);
     };
 
@@ -61,12 +62,43 @@ const HabitList = () => {
         handleShow();
     };
 
+    const handleArchive = (habit) => {
+        const updatedHabits = allHabits.map((h) => {
+          if (h === habit) {
+            return { ...h, archived: true };
+          }
+          return h;
+        }).filter((h) => !h.archived);
+        setAllHabits(updatedHabits);
+        setArchivedHabits([...archivedHabits, habit]);
+
+        setSelectedHabit(null);
+      };
+      
+    const handleUnarchive = (habit) => {
+        const updatedHabits = archivedHabits.filter((h) => h !== habit);
+        setArchivedHabits(updatedHabits);
+        setAllHabits([...allHabits, habit]);
+        setSelectedHabit(null);
+    };
+
     useEffect(() => {
         setAllHabits(habits);
     }, [habits]);
 
+    console.log(archivedHabits)
     return (
         <div>
+            <div>
+                <h2>Archived Habits</h2>
+                <ListGroup>
+                    {archivedHabits.map((habit, index) => (
+                        <ListGroup.Item key={index}>
+                            <Button variant="link" onClick={() => handleHabitClick(habit)}>{habit.name}</Button>
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+            </div>
             <h2>Habit Listing Page</h2>
             <ListGroup>
                 {allHabits.map((habit, index) => (
@@ -81,6 +113,8 @@ const HabitList = () => {
                     habit={selectedHabit}
                     onDelete={handleDelete}
                     onEdit={handleEditHabit}
+                    onArchive={handleArchive}
+                    onUnarchive={handleUnarchive}
                 />
             )}
 
