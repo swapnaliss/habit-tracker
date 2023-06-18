@@ -16,9 +16,9 @@ const Habit = ({ habit, onEdit, onDelete, onArchive, onUnarchive }) => {
         onArchive(habit);
     };
 
-    const handleUnarchive = () => {
-        onUnarchive(habit);
-    };
+    // const handleUnarchive = () => {
+    //     onUnarchive(habit);
+    // };
 
     // const renderArchiveButton = () => {
     //     if (habit.archived) {
